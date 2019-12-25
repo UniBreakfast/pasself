@@ -12,10 +12,13 @@ const
     },
     async user(ref) {
       this.requestedUser = ref
-      return ref=='guest'? null :
-        {hash: '$2a$04$bbrFhxI7hw5CuDfqgX4FUu0HxD5PSiP3PI.vTNN.DXu2oA4z4B4e.'}
+      return ref==13? null : userDuck
+    },
+    async updUser(id, props) {
+      assign(userDuck, props)
     }
   },
+  userDuck = {hash: '$2a$04$bbrFhxI7hw5CuDfqgX4FUu0HxD5PSiP3PI.vTNN.DXu2oA4z4B4e.'}
 
   passElf = require('.'),
   methods = 'reg, check, change'.split(', '),
@@ -68,7 +71,7 @@ const
       fail("passElf.reg(login, pass) didn't return the answer of the dataElf.addUser(login, hash) call")
   }),
 
-  check = makeTest("passElf.check(id | login, pass) supposed to get the user's hash via dataElf.user(id | {login}).hash, check the pass against it and return true if it is correct, false if not or null if brute force suspected", "and it does all that!", async (fail, crit)=> {
+  check = makeTest("passElf.check(id | login, pass) supposed to get the user's hash via dataElf.user(id | {login}).hash, check the pass against it and return true if it is correct, false if not or null if brute force suspected", "and it does all that!", async (fail, crit, sleep)=> {
 
     const id = 3, login = 'Joe', pass = 'jeronimo',
           answer = await passElf.check(id, pass)
@@ -87,13 +90,13 @@ const
     if (await passElf.check(id, 'wrong') !== false)
       fail("passElf.check(id | login, pass) didn't return false on incorrect pass")
 
-    if (await passElf.check('guest', pass) !== false)
+    if (await passElf.check(13, pass) !== false)
       fail("passElf.check(id | login, pass) didn't return false on incorrect id | login")
 
-    await passElf.check(id, pass)
-    await passElf.check(id, pass)
-    await passElf.check(id, pass)
+    passElf.check(id, 'wrong') && await sleep(10)
+    passElf.check(id, 'wrong') && await sleep(10)
+    passElf.check(id, 'wrong') && await sleep(10)
 
     if (await passElf.check(id, pass) !== null)
-      fail("passElf.check(id | login, pass) didn't return null on the fourth check in a row")
+      fail("passElf.check(id | login, pass) didn't return null if it's necessary to wait after three checks")
   })
