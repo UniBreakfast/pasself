@@ -1,0 +1,23 @@
+{
+  "name": "pasself",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node pasself.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniBreakfast/pasself.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UniBreakfast/pasself/issues"
+  },
+  "homepage": "https://github.com/UniBreakfast/pasself#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  }
+}
