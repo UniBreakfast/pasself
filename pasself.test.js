@@ -1,9 +1,8 @@
 
 const
   makeTest = require('./tester'),
-  { assign, keys, values } = Object,
-  c = console.log,
-  { hash, compare } = require('bcryptjs'),
+  { assign, keys } = Object,
+  { compare } = require('bcryptjs'),
 
   dataDuck = {
     async addUser(login, hash) {
