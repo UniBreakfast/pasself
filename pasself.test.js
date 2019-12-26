@@ -16,6 +16,7 @@ const
     },
     async updUser(id, props) {
       assign(userDuck, props)
+      return true
     }
   },
   userDuck = {hash: '$2a$04$bbrFhxI7hw5CuDfqgX4FUu0HxD5PSiP3PI.vTNN.DXu2oA4z4B4e.'}
@@ -27,9 +28,10 @@ const
     await init()
     await reg(1)
     await check(1)
+    await change(1)
   }, 100),
 
-  init = makeTest("passElf module supposed to be exporting an object with one method - a function .attach(dataElf), that supposed to initialize the passElf with a reference to a dataElf object and add the rest of the methods, also it supposed to return the passElf object itself", "and it does all that!",
+  init = makeTest("passElf module is supposed to be exporting an object with one method - a function .attach(dataElf), that supposed to initialize the passElf with a reference to a dataElf object and add the rest of the methods, also it supposed to return the passElf object itself", "and it does all that!",
     async (fail, crit)=> {
 
     const absent = []
@@ -56,7 +58,7 @@ const
     }
   }),
 
-  reg = makeTest("passElf.reg(login, pass) supposed to hash the password, add the new record to the users collection via dataElf.addUser(login, hash) and return the id of the record added.", "and it does all that!", async (fail, crit)=> {
+  reg = makeTest("passElf.reg(login, pass) is supposed to hash the password, add the new record to the users collection via dataElf.addUser(login, hash) and return the id of the record added.", "and it does all that!", async (fail, crit)=> {
 
     const login = 'Joe', pass = 'jeronimo',
           answer = await passElf.reg(login, pass)
@@ -71,7 +73,7 @@ const
       fail("passElf.reg(login, pass) didn't return the answer of the dataElf.addUser(login, hash) call")
   }),
 
-  check = makeTest("passElf.check(id | login, pass) supposed to get the user's hash via dataElf.user(id | {login}).hash, check the pass against it and return true if it is correct, false if not or null if brute force suspected", "and it does all that!", async (fail, crit, sleep)=> {
+  check = makeTest("passElf.check(id | login, pass) is supposed to get the user's hash via dataElf.user(id | {login}).hash, check the pass against it and return true if it is correct, false if not or null if brute force suspected with the help of dataElf.updUser(id, {guess | last})", "and it does all that!", async (fail, crit, sleep)=> {
 
     const id = 3, login = 'Joe', pass = 'jeronimo',
           answer = await passElf.check(id, pass)
@@ -93,10 +95,31 @@ const
     if (await passElf.check(13, pass) !== false)
       fail("passElf.check(id | login, pass) didn't return false on incorrect id | login")
 
+    await passElf.check(id, 'wrong')
+    await passElf.check(id, 'wrong')
     passElf.check(id, 'wrong') && await sleep(10)
-    passElf.check(id, 'wrong') && await sleep(10)
-    passElf.check(id, 'wrong') && await sleep(10)
+
+    if (userDuck.guess != 3)
+      fail("passElf.check(id | login, pass) didn't update the sequential guess cound on the user")
+
+    if (userDuck.last < Date.now()-50 || userDuck.last > Date.now())
+      fail("passElf.check(id | login, pass) didn't update the last guess timestamp on the user correctly")
 
     if (await passElf.check(id, pass) !== null)
       fail("passElf.check(id | login, pass) didn't return null if it's necessary to wait after three checks")
+  }),
+
+  change = makeTest("passElf.change(id | login, pass) is supposed to hash the password and replace the old hash with the new one via dataElf.updUser(id | {login}, {hash}). It should return its returned value.", "and it does all that!", async (fail, crit)=> {
+
+    const id = 3, pass = 'jeronimo',
+          answer = await passElf.change(id, pass)
+
+    if (userDuck.hash == '$2a$04$bbrFhxI7hw5CuDfqgX4FUu0HxD5PSiP3PI.vTNN.DXu2oA4z4B4e.')
+      crit("passElf.change(id | login, pass) didn't call the dataElf.updUser(id | {login}, {hash}) to replace the hash with the new one'")
+
+    if (!compare('jeronimo', userDuck.hash))
+      fail("passElf.change(id | login, pass) didn't hash the password correctly'")
+
+    if (answer !== true)
+      fail("passElf.change(id | login, pass) didn't return the value returned by the dataElf.updUser(id | {login}, {hash})'")
   })
