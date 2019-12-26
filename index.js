@@ -2,7 +2,7 @@
 let dataElf
 
 const
-  { assign, entries } = Object, { min, max } = Math,
+  { assign } = Object, { min, max } = Math,
   { hash, compare } = require('bcryptjs'),
 
   reg = async (login, pass) => await dataElf.addUser(login, await hash(pass,4)),
@@ -28,8 +28,9 @@ const
     return verdict
   },
 
-  change = async (ref, pass) => {},
-
+  change = async (ref, pass) =>
+    await dataElf.updUser(typeof ref=='number'? ref : {login: ref},
+      {hash: await hash(pass, 4)}),
 
   attach = async dataElfRef => (dataElf = dataElfRef) &&
     assign(exports, {reg, check, change})

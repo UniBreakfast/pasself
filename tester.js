@@ -1,9 +1,11 @@
 JSON.same =(a, b)=> JSON.stringify(a) == JSON.stringify(b)
 
+let n = 0
 const
   c = console.log,
   sleep = time => new Promise(wakeUp => setTimeout(wakeUp, time)),
-  test = (title, finish, err) => (title = "-".repeat(80)+"\nTEST: "+title) &&
+  test = (title, finish, err) => (title = `___/ ${++n} \\${'_'.repeat(70)}
+TEST: `+title) &&
     [
       msg => !err && c(title) || c("FAIL: "+msg) || (err=1),
       ()=> !err && (c(title) || c(" OK:  "+finish)),
